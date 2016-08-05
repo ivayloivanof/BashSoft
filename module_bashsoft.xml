@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_bashsoft" default="compile.module.bashsoft">
+    <dirname property="module.bashsoft.basedir" file="${ant.file.module_bashsoft}"/>
+
+    <property name="module.jdk.home.bashsoft" value="${project.jdk.home}"/>
+    <property name="module.jdk.bin.bashsoft" value="${project.jdk.bin}"/>
+    <property name="module.jdk.classpath.bashsoft" value="${project.jdk.classpath}"/>
+
+    <property name="compiler.args.bashsoft" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+
+    <property name="bashsoft.output.dir" value="${module.bashsoft.basedir}/out/production/BashSoft"/>
+    <property name="bashsoft.testoutput.dir" value="${module.bashsoft.basedir}/out/test/BashSoft"/>
+
+    <path id="bashsoft.module.bootclasspath">
+        <!-- Paths to be included in compilation bootclasspath -->
+    </path>
+
+    <path id="bashsoft.module.production.classpath">
+        <path refid="${module.jdk.classpath.bashsoft}"/>
+    </path>
+
+    <path id="bashsoft.runtime.production.module.classpath">
+        <pathelement location="${bashsoft.output.dir}"/>
+    </path>
+
+    <path id="bashsoft.module.classpath">
+        <path refid="${module.jdk.classpath.bashsoft}"/>
+        <pathelement location="${bashsoft.output.dir}"/>
+    </path>
+
+    <path id="bashsoft.runtime.module.classpath">
+        <pathelement location="${bashsoft.testoutput.dir}"/>
+        <pathelement location="${bashsoft.output.dir}"/>
+    </path>
+
+
+    <patternset id="excluded.from.module.bashsoft">
+        <patternset refid="ignored.files"/>
+    </patternset>
+
+    <patternset id="excluded.from.compilation.bashsoft">
+        <patternset refid="excluded.from.module.bashsoft"/>
+    </patternset>
+
+    <path id="bashsoft.module.sourcepath">
+        <dirset dir="${module.bashsoft.basedir}">
+            <include name="src"/>
+        </dirset>
+    </path>
+
+
+    <target name="compile.module.bashsoft" depends="compile.module.bashsoft.production,compile.module.bashsoft.tests"
+            description="Compile module BashSoft"/>
+
+    <target name="compile.module.bashsoft.production" depends="register.custom.compilers"
+            description="Compile module BashSoft; production classes">
+        <mkdir dir="${bashsoft.output.dir}"/>
+        <javac2 destdir="${bashsoft.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
+                memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.bashsoft}/javac">
+            <compilerarg line="${compiler.args.bashsoft}"/>
+            <bootclasspath refid="bashsoft.module.bootclasspath"/>
+            <classpath refid="bashsoft.module.production.classpath"/>
+            <src refid="bashsoft.module.sourcepath"/>
+            <patternset refid="excluded.from.compilation.bashsoft"/>
+        </javac2>
+
+        <copy todir="${bashsoft.output.dir}">
+            <fileset dir="${module.bashsoft.basedir}/src">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile.module.bashsoft.tests" depends="register.custom.compilers,compile.module.bashsoft.production"
+            description="compile module BashSoft; test classes" unless="skip.tests"/>
+
+    <target name="clean.module.bashsoft" description="cleanup module">
+        <delete dir="${bashsoft.output.dir}"/>
+        <delete dir="${bashsoft.testoutput.dir}"/>
+    </target>
+</project>
